@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Birthday Party Memories</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+:root {
+    --primary: #f8d7e8;
+    --secondary: #ffb6d9;
+    --accent: #ff66a3;
+    --accent-light: #ff99c2;
+    --text: #5a3d5c;
+    --light: #fff;
+
+    /* Smoother, slower animation for sliding */
+    --anim-duration: 420ms;
+    --anim-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    :root { 
+        --anim-duration: 180ms; 
+        --transition: all 0.1s ease;
+    }
+}
+
+/* Reset / base */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; }
+body {
+    background: linear-gradient(135deg, var(--primary), #fff0f5);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    padding: 1.5rem;
+    text-align: center;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    animation: slideDown 0.8s ease-out;
+}
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+.header h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(to right, var(--accent), #ff3399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.3rem;
+}
+.header p { font-size: 1rem; color: var(--text); }
+
+/* Birthday message card */
+.birthday-message {
+    text-align: center;
+    padding: 1.2rem;
+    margin: 9.5rem auto 1.5rem;
+    max-width: 600px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    animation: fadeIn 1s ease-out 0.3s both;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Media grid */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+/* Card base */
+.media-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 1;
+    border: 5px solid white;
+    transition: var(--transition);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    animation: cardAppear 0.6s ease-out both;
+    animation-delay: calc(var(--card-index, 0) * 0.05s);
+    will-change: transform;
+}
+@keyframes cardAppear { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.media-card img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    display: block;
+    transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1), 
+                filter 0.45s cubic-bezier(0.23, 1, 0.32, 1), 
+                opacity 0.45s cubic-bezier(0.23,1,0.32,1); /* ensure opacity transition too */
+    transform-origin: center center;
+    backface-visibility: hidden; 
+    position: relative; 
+    z-index: 0;
+    will-change: transform, opacity;
+}
+.media-card::before {
+    content: ""; 
+    position: absolute; 
+    inset: 0; 
+    background: rgba(0,0,0,0.4);
+    z-index: 2; 
+    opacity: 0; 
+    transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
+    pointer-events: none;
+}
+.media-card::after {
+    content: "🎀"; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%,-50%) scale(0.85) rotate(-12deg);
+    font-size: 3.2rem; 
+    z-index: 3; 
+    opacity: 0; 
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    text-shadow: 0 0 12px rgba(0,0,0,0.5);
+    filter: drop-shadow(0 0 10px rgba(255,102,163,0.6)); 
+    pointer-events: none;
+}
+.media-card:hover { 
+    transform: translateY(-8px) scale(1.05); 
+    border-color: var(--accent);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35), 0 0 35px rgba(255,102,163,0.16); 
+}
+.media-card:hover::before { opacity: 1; }
+.media-card:hover::after { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+}
+.media-card:hover img { 
+    transform: scale(1.08); 
+    filter: brightness(1.05) contrast(1.08); 
+}
+
+/* Decorations */
+.decoration { position: fixed; z-index: -1; opacity: 0.18; }
+.decoration.circle { width: 300px; height: 300px; border-radius: 50%; background: var(--accent);
+    top: -100px; right: -100px; animation: float 15s infinite ease-in-out; }
+.decoration.heart { font-size: 200px; bottom: -50px; left: -50px; color: var(--accent); animation: float 20s infinite ease-in-out reverse; }
+@keyframes float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+
+/* Fullscreen viewer */
+#fullscreenViewer { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.95);
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
+    overflow: hidden;
+}
+#fullscreenViewer.active { display: flex; animation: fadeIn 0.3s ease-out; }
+#fullscreenViewer.exiting { animation: fadeOut 0.3s ease-out forwards; }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* Fullscreen container */
+#fullscreenContent { 
+    position: relative; 
+    z-index: 1000; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+    height: 100%;
+}
+
+/* Fullscreen image base */
+#fullscreenViewer img {
+    max-width: 90vw; 
+    max-height: 90vh; 
+    border-radius: 12px; 
+    border: 6px solid white;
+    box-shadow: 0 0 50px rgba(0,0,0,0.85), 0 0 0 22px rgba(255,255,255,0.04), 0 0 80px rgba(255,102,163,0.28);
+    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-origin: center center; 
+    position: absolute; 
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+/* New sliding animations */
+.slide-in-next {
+    animation: slideInNext var(--anim-duration) var(--anim-ease) forwards;
+}
+
+.slide-in-prev {
+    animation: slideInPrev var(--anim-duration) var(--anim-ease) forwards;
+}
+
+.slide-out-next {
+    animation: slideOutNext var(--anim-duration) var(--anim-ease) forwards;
+}
+
+.slide-out-prev {
+    animation: slideOutPrev var(--anim-duration) var(--anim-ease) forwards;
+}
+
+@keyframes slideInNext {
+    0% { opacity: 0; transform: translateX(100px) scale(0.98); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes slideInPrev {
+    0% { opacity: 0; transform: translateX(-100px) scale(0.98); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes slideOutNext {
+    0% { opacity: 1; transform: translateX(0) scale(1); }
+    100% { opacity: 0; transform: translateX(-100px) scale(0.98); }
+}
+@keyframes slideOutPrev {
+    0% { opacity: 1; transform: translateX(0) scale(1); }
+    100% { opacity: 0; transform: translateX(100px) scale(0.98); }
+}
+
+/* Close animation */
+.zoom-out {
+    animation: zoomOut var(--anim-duration) var(--anim-ease) forwards;
+}
+@keyframes zoomOut {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+}
+
+/* hover in fullscreen - made smoother */
+#fullscreenViewer img:hover {
+    border-color: var(--accent);
+    transform: scale(1.02);
+    box-shadow:
+        0 0 36px var(--accent),
+        0 0 68px rgba(255,102,163,0.6),
+        0 0 120px rgba(255,102,163,0.85),
+        0 18px 60px rgba(0,0,0,0.6);
+}
+
+/* Close button */
+#fullscreenViewer span {
+    position: absolute; top: 22px; right: 30px; font-size: 3rem; color: white; cursor: pointer;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5); transition: var(--transition); z-index: 1001;
+    user-select: none; padding: 6px; border-radius: 8px;
+}
+#fullscreenViewer span:hover { color: var(--accent); transform: scale(1.06); text-shadow: 0 0 18px rgba(255,102,163,0.6); }
+
+/* Nav buttons (prev/next) */
+.nav-buttons { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; padding: 0 2rem; transform: translateY(-50%); z-index: 1001; pointer-events: none; }
+.nav-btn { 
+    pointer-events: auto; 
+    background: rgba(255,255,255,0.12); 
+    border: none; 
+    color: white; 
+    font-size: 2rem; 
+    width: 64px; 
+    height: 64px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    backdrop-filter: blur(5px); 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45); 
+}
+.nav-btn:hover { 
+    background: var(--accent-light); 
+    transform: scale(1.08); 
+    box-shadow: 0 0 26px rgba(255,102,163,0.7); 
+    color: white; 
+}
+
+/* image counter label */
+.counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 1.1rem; background: rgba(0,0,0,0.45); padding: 8px 18px; border-radius: 20px; backdrop-filter: blur(4px); box-shadow: 0 6px 18px rgba(0,0,0,0.45); z-index: 1001; }
+
+/* loading indicator */
+.loading { text-align: center; padding: 2rem; font-size: 1.4rem; color: var(--accent); display: none; }
+.loading.active { display: block; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+/* zoom hint text */
+.zoom-hint { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.75); font-size: 0.95rem; text-align: center; width: 100%; z-index: 1001; animation: fadeInOut 3s infinite; }
+@keyframes fadeInOut { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .header h1 { font-size: 1.8rem; }
+    .header { padding: 1rem; }
+    .birthday-message { 
+        margin: 7rem 1rem 1rem; 
+        padding: 1rem; 
+    }
+    .media-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); padding: 1rem; gap: 1rem; }
+    .nav-buttons { padding: 0 1rem; }
+    .nav-btn { width: 52px; height: 52px; font-size: 1.5rem; }
+    .zoom-hint { display: none; }
+    
+    /* Smoother animations for mobile */
+    .media-card:hover { 
+        transform: translateY(-4px) scale(1.03); 
+    }
+    .media-card:hover img { 
+        transform: scale(1.05); 
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .birthday-message { 
+        margin: 6.5rem 0.8rem 1rem; 
+        padding: 0.8rem; 
+    }
+    .header h1 { font-size: 1.6rem; }
+    .header p { font-size: 0.9rem; }
+}
+    </style>
+</head>
+<body>
+    <div class="decoration circle"></div>
+    <div class="decoration heart">♥</div>
+
+    <header class="header">
+        <h1>🎀 Маријин Рођендан 🎀</h1>
+        <p>Прослава осамнаестог рођендана у кругу пријатеља и породице</p>
+    </header>
+
+    <div class="birthday-message">
+        <h2>Срећан рођендан!</h2>
+        <p>Хвала вам што сте са нама поделили радост овог посебног дана. У наставку су тренуци и успомене које ће се памтити!</p>
+    </div>
+
+    <div class="media-grid" id="publicContent"></div>
+
+    <div class="loading" id="loadingIndicator"><i class="fas fa-spinner fa-spin"></i> Loading more photos...</div>
+
+    <!-- Fullscreen viewer -->
+    <div id="fullscreenViewer" role="dialog" aria-hidden="true" aria-label="Image viewer">
+        <span onclick="closeFullscreen()" aria-label="Close">&times;</span>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" aria-label="Previous">&#10094;</button>
+            <button class="nav-btn" id="nextBtn" aria-label="Next">&#10095;</button>
+        </div>
+        <div class="counter" id="imageCounter" aria-hidden="false"></div>
+        <div class="zoom-hint">Use arrow keys or click buttons to navigate</div>
+        <div id="fullscreenContent" aria-live="polite"></div>
+    </div>
+
+    <script>
+/* ====== CONFIG ====== */
+const INITIAL_LOAD = 50;
+const BATCH_SIZE = 50;
+const RENDER_CHUNK = 12;
+const IO_ROOT_MARGIN = '400px 0px';
+const RENDER_DEBOUNCE = 120;
+const IMAGE_FOLDER = '/images/'; // adjust if needed
+
+/* ====== STATE ====== */
+let allMedia = [];
+let displayedCount = 0;
+let currentImageIndex = 0;
+let isTransitioning = false;
+
+/* ====== ELEMENTS ====== */
+const publicContent = document.getElementById('publicContent');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const fullscreenViewer = document.getElementById('fullscreenViewer');
+const fullscreenContent = document.getElementById('fullscreenContent');
+const imageCounter = document.getElementById('imageCounter');
+const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
+
+/* ====== UTIL ====== */
+const ric = window.requestIdleCallback || function (fn) { return setTimeout(fn, 50); };
+
+/* ====== INTERSECTION OBSERVER for lazy images ====== */
+const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target;
+        const src = img.dataset.src;
+        if (!src) { obs.unobserve(img); return; }
+
+        const preload = new Image();
+        preload.decoding = 'async';
+        preload.src = src;
+        preload.onload = () => {
+            img.src = src;
+            img.style.opacity = '';
+            obs.unobserve(img);
+        };
+        preload.onerror = () => {
+            img.src = src;
+            obs.unobserve(img);
+        };
+    });
+}, { root: null, rootMargin: IO_ROOT_MARGIN, threshold: 0.01 });
+
+/* create card */
+function createCardAtIndex(i) {
+    const media = allMedia[i];
+    if (!media) return null;
+
+    const card = document.createElement('div');
+    card.className = 'media-card';
+    card.style.setProperty('--card-index', i);
+
+    const img = document.createElement('img');
+    img.alt = media.alt || `img-${i}`;
+    img.loading = 'lazy';
+    img.dataset.src = media.src;
+    img.style.opacity = '0';
+    img.addEventListener('load', () => { img.style.opacity = ''; });
+
+    card.appendChild(img);
+    card.addEventListener('click', () => openFullscreen(i));
+    io.observe(img);
+
+    return card;
+}
+
+/* render chunks */
+function renderNextChunk() {
+    if (displayedCount >= allMedia.length) return;
+    const start = displayedCount;
+    const end = Math.min(allMedia.length, start + RENDER_CHUNK);
+    const frag = document.createDocumentFragment();
+    for (let i = start; i < end; i++) {
+        if (publicContent.children[i]) { displayedCount++; continue; }
+        const card = createCardAtIndex(i);
+        if (card) frag.appendChild(card);
+        displayedCount++;
+    }
+    ric(() => publicContent.appendChild(frag));
+}
+
+function loadMoreBatchSmart(batch = BATCH_SIZE) {
+    if (displayedCount >= allMedia.length) return;
+    loadingIndicator.classList.add('active');
+
+    const totalToLoad = Math.min(batch, allMedia.length - displayedCount);
+    const chunks = Math.ceil(totalToLoad / RENDER_CHUNK);
+    let renderedChunks = 0;
+
+    function step() {
+        renderNextChunk();
+        renderedChunks++;
+        if (renderedChunks < chunks) ric(step);
+        else loadingIndicator.classList.remove('active');
+    }
+    step();
+}
+
+function renderInitial() {
+    const initialChunks = Math.ceil(INITIAL_LOAD / RENDER_CHUNK);
+    let c = 0;
+    function step() {
+        renderNextChunk();
+        c++;
+        if (c < initialChunks) ric(step);
+    }
+    step();
+}
+
+/* ====== FULLSCREEN SLIDING ANIMATIONS ====== */
+function showImage(index, direction = 0) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    const media = allMedia[(index + allMedia.length) % allMedia.length];
+    const oldImg = fullscreenContent.querySelector('img');
+
+    // create new image
+    const newImg = document.createElement('img');
+    newImg.src = media.src;
+    newImg.alt = media.alt || '';
+    newImg.style.willChange = 'opacity, transform';
+
+    // Apply appropriate slide animation based on direction
+    if (direction === 1) {
+        // Next - slide in from right
+        newImg.classList.add('slide-in-next');
+    } else if (direction === -1) {
+        // Previous - slide in from left
+        newImg.classList.add('slide-in-prev');
+    } else {
+        // Initial open - fade in WITHOUT overriding global transition
+        newImg.style.opacity = '0';
+        // append first so transition can run
+        fullscreenContent.appendChild(newImg);
+        // double rAF to ensure browser registers element, then start opacity change
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                newImg.style.opacity = '1';
+            });
+        });
+    }
+
+    // append new image (if not appended already in initial case)
+    if (!fullscreenContent.contains(newImg)) fullscreenContent.appendChild(newImg);
+
+    // animate old image out if it exists
+    if (oldImg) {
+        if (direction === 1) {
+            oldImg.classList.add('slide-out-prev');
+        } else if (direction === -1) {
+            oldImg.classList.add('slide-out-next');
+        }
+
+        const onOldEnd = () => {
+            oldImg.removeEventListener('animationend', onOldEnd);
+            if (oldImg.parentNode) oldImg.parentNode.removeChild(oldImg);
+        };
+        oldImg.addEventListener('animationend', onOldEnd);
+    }
+
+    // new image animation end -> cleanup
+    const onNewEnd = () => {
+        newImg.removeEventListener('animationend', onNewEnd);
+        newImg.classList.remove('slide-in-next', 'slide-in-prev');
+        newImg.style.opacity = '1';
+        isTransitioning = false;
+    };
+    
+    if (direction !== 0) {
+        newImg.addEventListener('animationend', onNewEnd);
+    } else {
+        // initial open: we rely on CSS transition defined on #fullscreenViewer img, so wait a small bit
+        setTimeout(() => {
+            isTransitioning = false;
+        }, 80);
+    }
+
+    // show viewer & update counter
+    imageCounter.textContent = `${((index + allMedia.length) % allMedia.length) + 1} / ${allMedia.length}`;
+    fullscreenViewer.classList.add('active');
+    fullscreenViewer.style.display = 'flex';
+    fullscreenViewer.setAttribute('aria-hidden', 'false');
+
+    // prefetch neighbors for smoother nav
+    prefetchAround(index);
+}
+
+function openFullscreen(index) {
+    currentImageIndex = index;
+    fullscreenContent.innerHTML = '';
+    showImage(currentImageIndex, 0);
+}
+
+function closeFullscreen() {
+    if (isTransitioning) return;
+    const currentImg = fullscreenContent.querySelector('img');
+    if (!currentImg) {
+        fullscreenViewer.classList.remove('active');
+        fullscreenViewer.style.display = 'none';
+        fullscreenContent.innerHTML = '';
+        fullscreenViewer.setAttribute('aria-hidden', 'true');
+        return;
+    }
+
+    isTransitioning = true;
+    // zoom out animation for close
+    currentImg.classList.add('zoom-out');
+    fullscreenViewer.classList.add('exiting');
+
+    const onEnd = () => {
+        currentImg.removeEventListener('animationend', onEnd);
+        fullscreenViewer.classList.remove('active', 'exiting');
+        fullscreenViewer.style.display = 'none';
+        fullscreenViewer.setAttribute('aria-hidden', 'true');
+        fullscreenContent.innerHTML = '';
+        isTransitioning = false;
+    };
+    currentImg.addEventListener('animationend', onEnd);
+}
+
+function nextImage() {
+    if (isTransitioning) return;
+    currentImageIndex = (currentImageIndex + 1) % allMedia.length;
+    showImage(currentImageIndex, 1);
+}
+
+function prevImage() {
+    if (isTransitioning) return;
+    currentImageIndex = (currentImageIndex - 1 + allMedia.length) % allMedia.length;
+    showImage(currentImageIndex, -1);
+}
+
+function prefetchAround(index) {
+    const PRELOAD_COUNT = 4;
+    for (let offset = 1; offset <= PRELOAD_COUNT; offset++) {
+        const idx = (index + offset) % allMedia.length;
+        const u = allMedia[idx].src;
+        const p = new Image();
+        p.src = u;
+    }
+}
+
+/* click outside to close (preserve nav/close/counter clicks) */
+fullscreenViewer.addEventListener('click', (e) => {
+    const mediaEl = document.querySelector('#fullscreenContent img, #fullscreenContent video');
+    if (!mediaEl) return;
+    if (e.target === mediaEl) return;
+    if (e.target.closest('.nav-btn') || e.target.closest('#fullscreenViewer span') || e.target.closest('.counter')) {
+        return;
+    }
+    closeFullscreen();
+});
+
+/* buttons */
+nextBtn?.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+prevBtn?.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+
+/* keyboard */
+document.addEventListener('keydown', (e) => {
+    if (fullscreenViewer.style.display === 'flex') {
+        if (e.key === 'Escape') closeFullscreen();
+        if (e.key === 'ArrowRight' || e.key === ' ') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+    }
+});
+
+/* scroll listener (debounced) */
+let scrollTimer = null;
+window.addEventListener('scroll', () => {
+    if (scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+        if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 700)) {
+            if (!loadingIndicator.classList.contains('active') && displayedCount < allMedia.length) {
+                loadMoreBatchSmart(BATCH_SIZE);
+            }
+        }
+    }, RENDER_DEBOUNCE);
+});
+
+/* manifest init helpers */
+function isImageFile(name) {
+    return /\.(jpe?g|png|gif|webp|bmp|avif|heic)$/i.test(name);
+}
+function buildEntriesFromManifest(list) {
+    return list.filter(isImageFile).map((name, i) => ({
+        id: i+1,
+        src: IMAGE_FOLDER + encodeURIComponent(name),
+        alt: name,
+        type: 'image'
+    }));
+}
+
+async function initFromManifest() {
+    try {
+        const res = await fetch(IMAGE_FOLDER + 'manifest.json', {cache: 'no-cache'});
+        if (!res.ok) throw new Error('manifest not found');
+        const list = await res.json();
+        const entries = buildEntriesFromManifest(list);
+        if (!entries.length) throw new Error('no images in manifest');
+        allMedia = entries;
+
+        displayedCount = 0;
+        renderInitial();
+
+        return true;
+    } catch (err) {
+        console.warn('manifest load failed:', err);
+        showFallbackMessage();
+        return false;
+    }
+}
+
+function showFallbackMessage() {
+    const el = document.createElement('div');
+    el.style.textAlign = 'center';
+    el.style.margin = '6rem 1rem';
+    el.style.color = '#8a5a73';
+    el.innerHTML = `
+        <p><strong>No manifest found</strong> — create <code>${IMAGE_FOLDER}manifest.json</code> or use the folder-picker fallback.</p>
+        <p style="font-size:0.9rem; color:#6f4b63">If you ran the manifest generator, make sure the file is at <code>${IMAGE_FOLDER}manifest.json</code> and refresh.</p>
+    `;
+    document.body.insertBefore(el, publicContent);
+}
+
+/* start */
+document.addEventListener('DOMContentLoaded', async () => {
+    await initFromManifest();
+
+    // sparkle effect
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.media-card') || e.target.closest('.nav-btn')) {
+            createSparkle(e.clientX, e.clientY);
+        }
+    });
+
+    function createSparkle(x, y) {
+        const sparkle = document.createElement('div');
+        sparkle.style.position = 'fixed';
+        sparkle.style.left = `${x}px`;
+        sparkle.style.top = `${y}px`;
+        sparkle.style.width = '20px';
+        sparkle.style.height = '20px';
+        sparkle.style.background = 'radial-gradient(circle, var(--accent-light), transparent)';
+        sparkle.style.borderRadius = '50%';
+        sparkle.style.pointerEvents = 'none';
+        sparkle.style.zIndex = '1001';
+        sparkle.style.animation = 'sparkle 0.6s ease-out forwards';
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 600);
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes sparkle {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+});
+    </script>
+</body>
+</html>
